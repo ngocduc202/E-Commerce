@@ -3,17 +3,21 @@ const mongoose = require('mongoose'); // Erase if already required
 // Declare the Schema of the Mongo model
 var oderSchema = new mongoose.Schema({
     products:[
-      { product : {type : mongoose.Types.ObjectId , ref:'Product'} ,
-      count : Number ,
-      color : String
-      }
+        { product : {type : mongoose.Types.ObjectId , ref:'Product'} ,
+        count : Number ,
+        color : String
+        }
     ],
     status:{
         type:String,
         default : 'Processing',
         enum : ['Cancelled' , 'Processing' ,'Success']
     },
-    paymentIntent:{},
+    total:Number,
+    coupon :{
+        type : mongoose.Types.ObjectId ,
+        ref : 'Copon'
+    },
     orderBy:{
         type:mongoose.Types.ObjectId,
         ref : 'User'
