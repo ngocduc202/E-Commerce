@@ -8,7 +8,7 @@ const {RiPhoneFill ,MdEmail ,BsHandbagFill , FaUserCircle} = icons
 const Header = () => {
 
   return (
-    <div className='border w-main h-[110px] flex justify-between py-[35px]'>
+    <div className=' w-main h-[110px] flex justify-between py-[35px]'>
       <Link to={`/${path.HOME}`}>
       <img src={logo} alt="logo"  className='w-[234px] object-contain'/>
       </Link>
