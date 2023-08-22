@@ -4,33 +4,73 @@ const {generateAccessToken , generateRefreshToken} = require("../middlewares/jwt
 const jwt = require("jsonwebtoken")
 const sendEmail = require("../ultils/sendMail")
 const crypto = require("crypto")
+const makeToken = require('uniquid')
 
-const register  = asyncHandler(async (req , res) => {
-  const {email , password , firstname , lastname} = req.body
-  if(!email || !password || !lastname || ! firstname)
-  return res.status(400).json({
-    sucess : false,
-    mes : "Missing puts"
-  })
+// const register  = asyncHandler(async (req , res) => {
+//   const {email , password , firstname , lastname} = req.body
+//   if(!email || !password || !lastname || ! firstname)
+//   return res.status(400).json({
+//     success : false,
+//     mes : "Missing puts"
+//   })
 
-  const user = await User.findOne({email})
-  if(user)
-          throw new Error("User has existed!")
-  else{
-    const newUser = await User.create(req.body)
-    return res.status(200).json({
-      sucess : newUser ? true : false ,
-      mes : newUser ?  "Register is successfully . Please go login " : "Something went wrong"
+//   const user = await User.findOne({email})
+//   if(user)
+//           throw new Error("User has existed!")
+//   else{
+//     const newUser = await User.create(req.body)
+//     return res.status(200).json({
+//       success : newUser ? true : false ,
+//       mes : newUser ?  "Register is successfully . Please go login " : "Something went wrong"
+//     })
+//   }
+
+// })
+
+const register = asyncHandler ( async (req , res) => {
+  const {email , password , firstname , lastname , mobile} = req.body
+    if(!email || !password || !lastname || ! firstname || ! mobile)
+    return res.status(400).json({
+      success : false,
+      mes : "Missing puts"
     })
-  }
+      const user = await User.findOne({email})
+      if(user)
+          throw new Error("User has existed!")
+      else{
+        const token = makeToken()
+        res.cookie("dataregister" , {...req.body , token} , {httpOnly : true , maxAge : 15*60*1000})
+        const html = `Xin vui lòng click vào link dưới đây để hoàn tất quá trình đăng ký.Link này sẽ hết hạn sau 15p <a
+        href=${process.env.URL_SERVER}/api/user/finalregister/${token}
+        >Click here</a>`
+        await sendEmail({email , html , subject : 'Hoàn tất đăng ký'})
+        return res.json({
+          success : true ,
+          mes : 'Please check your emai to active account'
+        })
+      }
+})
 
+const finalRegister = asyncHandler( async (req, res) => {
+  const cookie = req.cookies
+  const {token} = req.params
+  if(!cookie || cookie?.dataregister?.token !== token) return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
+  const newUser = await User.create({
+      email : cookie?.dataregister?.email ,
+      password : cookie?.dataregister?.password,
+      mobile : cookie?.dataregister?.mobile,
+      firstname : cookie?.dataregister?.firstname,
+      lastname : cookie?.dataregister?.lastname
+    })
+      if(newUser) return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`)
+      else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
 })
 
 const login  = asyncHandler(async (req , res) => {
   const {email , password } = req.body
   if(!email || !password)
   return res.status(400).json({
-    sucess : false,
+    success : false,
     mes : "Missing puts"
   })
 
@@ -42,7 +82,7 @@ const login  = asyncHandler(async (req , res) => {
     await User.findByIdAndUpdate(response._id , {refreshToken : newrefreshToken} , {new : true})
     res.cookie('refreshToken' , newrefreshToken , {httpOnly : true , maxAge : 7*24*60*60*1000})
       return res.status(200).json({
-        sucess : true ,
+        success : true ,
         accessToken,
         userData
       })
@@ -101,7 +141,8 @@ const forgotPassword = asyncHandler(async (req , res) => {
 
     const data = {
       email,
-      html
+      html ,
+      subject : 'Forgot password'
     }
 
     const rs = await sendEmail(data)
@@ -222,5 +263,6 @@ module.exports = {
   updateUser,
   updateUserByAdmin ,
   updateUserAddress ,
-  updateCart
+  updateCart ,
+  finalRegister
 }
