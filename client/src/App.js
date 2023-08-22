@@ -1,9 +1,12 @@
 import React ,{useEffect} from 'react';
 import {Route , Routes} from 'react-router-dom'
-import {Login , Home , Public , Blogs ,DetailProduct ,FAQ , Services ,Product ,FinalRegister} from './pages/public'
+import {Login , Home , Public , Blogs ,DetailProduct ,FAQ , Services ,Product ,FinalRegister , ResetPassword} from './pages/public'
 import path from './ultils/path';
 import {getCategories} from './store/app/asyncAction'
 import {useDispatch} from 'react-redux'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
   const dispatch = useDispatch()
@@ -20,11 +23,25 @@ function App() {
               <Route path={path.FAQ} element={<FAQ />} />
               <Route path={path.OUR_SERVICES} element={<Services />} />
               <Route path={path.PRODUCTS} element={<Product />} />
+              <Route path={path.RESET_PASSWORD} element={<ResetPassword />} />
 
           </Route>
               <Route path={path.FINAL_REGISTER} element={<FinalRegister />} />
           <Route path={path.LOGIN} element={<Login />} />
       </Routes>
+      <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          />
+          {/* Same as */}
+          <ToastContainer />
     </div>
   );
 }

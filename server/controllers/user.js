@@ -54,7 +54,11 @@ const register = asyncHandler ( async (req , res) => {
 const finalRegister = asyncHandler( async (req, res) => {
   const cookie = req.cookies
   const {token} = req.params
-  if(!cookie || cookie?.dataregister?.token !== token) return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
+  if(!cookie || cookie?.dataregister?.token !== token)
+  {
+    res.clearCookie('dataregister')
+    return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
+  }
   const newUser = await User.create({
       email : cookie?.dataregister?.email ,
       password : cookie?.dataregister?.password,
@@ -62,6 +66,7 @@ const finalRegister = asyncHandler( async (req, res) => {
       firstname : cookie?.dataregister?.firstname,
       lastname : cookie?.dataregister?.lastname
     })
+    res.clearCookie('dataregister')
       if(newUser) return res.redirect(`${process.env.CLIENT_URL}/finalregister/success`)
       else return res.redirect(`${process.env.CLIENT_URL}/finalregister/failed`)
 })
@@ -128,7 +133,7 @@ const logout = asyncHandler(async (req, res) => {
 })
 
 const forgotPassword = asyncHandler(async (req , res) => {
-    const {email} = req.query
+    const {email} = req.body
     if(!email) throw new Error("Missing Email")
     const user = await User.findOne({email})
     if(!user) throw new Error("User not found")
@@ -136,7 +141,7 @@ const forgotPassword = asyncHandler(async (req , res) => {
     await user.save()
 
     const html = `Xin vui lòng click vào link dưới đây để thay đổi mật khẩu của bạn.Link này sẽ hết hạn sau 15p <a
-    href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}
+    href=${process.env.CLIENT_URL}/reset-password/${resetToken}
     >Click here</a>`
 
     const data = {
@@ -147,8 +152,8 @@ const forgotPassword = asyncHandler(async (req , res) => {
 
     const rs = await sendEmail(data)
     return res.status(200).json({
-      success : true ,
-      rs
+      success : rs.response?.includes('OK') ? true : false ,
+      mes : rs.response?.includes('OK') ? 'Please check your email' : 'Something went wrong. Please try later'
     })
 
 })
