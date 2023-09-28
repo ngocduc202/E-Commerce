@@ -1,8 +1,9 @@
 import React , {useEffect , useState , useCallback} from 'react'
-import {useParams , useSearchParams} from 'react-router-dom'
-import {Breadcrumb , Product, SearchItem} from '../../components'
+import {useParams , useSearchParams , useNavigate , createSearchParams} from 'react-router-dom'
+import {Breadcrumb , Product, SearchItem , InputSelect} from '../../components'
 import { apiGetProducts } from '../../apis'
 import Masonry from 'react-masonry-css'
+import { sorts } from '../../ultils/contanst'
 
 const breakpointColumnsObj = {
   default: 4,
@@ -12,21 +13,44 @@ const breakpointColumnsObj = {
 }
 
 const Products = () => {
-
+  const navigate = useNavigate()
   const [products, setProducts] = useState(null)
   const [activeClick, setActiveClick] = useState(null)
+  const [params] = useSearchParams()
+  const [sort, setSort] = useState('')
 
   const fetchProductsByCategory = async (queries) => {
-    const response = await apiGetProducts({queries})
+    const response = await apiGetProducts(queries)
     if(response.success) {
       setProducts(response.products)
     }
   }
 
+
   const {category} = useParams()
   useEffect(() => {
-  fetchProductsByCategory()
-  }, [])
+    let param = []
+    for(let i of params.entries()) param.push(i)
+    const queries ={}
+    for(let i of params) queries[i[0]] = i[1]
+    let priceQuery = {}
+    if(queries.to && queries.from){
+        priceQuery = { $and : [
+        {price : {gte : queries.from}},
+        {price : {lte : queries.to}}
+      ]}
+      delete queries.price
+    }
+    if(queries.from) {
+      queries.price = {gte : queries.from}
+    }
+    if(queries.to) {
+      queries.price = {lte : queries.to}
+    }
+    delete queries.to
+    delete queries.from
+  fetchProductsByCategory({...priceQuery , ...queries})
+  }, [params])
 
   const changeActiveFilter = useCallback((name) => {
     if(activeClick === name) {
@@ -36,6 +60,20 @@ const Products = () => {
       setActiveClick(name)
     }
   }, [activeClick])
+
+  const changeValue =useCallback((value) => {
+    setSort(value)
+  } ,[sort])
+
+  useEffect(() => {
+    navigate({
+      pathname :`/${category}` ,
+      search : createSearchParams({
+        sort
+      }).toString()
+    })
+  }, [sort])
+
 
   return (
     <div className='w-full'>
@@ -55,6 +93,7 @@ const Products = () => {
                 name = 'price'
                 activeClick={activeClick}
                 changeActiveFilter = {changeActiveFilter}
+                type='input'
                 />
                 <SearchItem
                 name = 'color'
@@ -63,8 +102,15 @@ const Products = () => {
                 />
                 </div>
             </div>
-            <div className='w-1/5'>
-                Sort by
+            <div className='w-1/5 flex flex-col gap-3'>
+            <span className='font-semibold text-sm'>Sort by</span>
+            <div className='w-full'>
+              <InputSelect
+              value={sort}
+              options={sorts}
+              changeValue={changeValue}
+              />
+            </div>
             </div>
         </div>
         <div className=' mt-8 w-main m-auto'>
@@ -74,7 +120,7 @@ const Products = () => {
           columnClassName="my-masonry-grid_column">
           {products?.map(el =>(
             <Product
-            key={el.id}
+            key={el._id}
             pid={el.id}
             productData={el}
             normal={true}
