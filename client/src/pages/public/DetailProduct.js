@@ -19,11 +19,13 @@ const DetailProduct = () => {
   const {pid , title , category} = useParams()
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
+  const [currentImage, setCurrentImage] = useState(null)
   const [relatedProduct, setRelatedProduct] = useState(null)
   const fetchProductData = async () => {
     const response = await apiGetProduct(pid)
     if(response.success) {
       setProduct(response.productData)
+      setCurrentImage(response.productData?.thumb)
     }
   }
   const fetchProducts = async () => {
@@ -37,6 +39,7 @@ const DetailProduct = () => {
       fetchProductData()
       fetchProducts()
     }
+    window.scrollTo(0 ,0)
   }, [pid])
 
   const handleQuantity = useCallback((number) => {
@@ -58,6 +61,12 @@ const DetailProduct = () => {
       setQuantity(prev => +prev +1)
     }
   } ,[quantity])
+
+  const handleClickImage = (e ,el) => {
+    e.stopPropagation()
+    setCurrentImage(el)
+  }
+
   return (
     <div className='w-full'>
       <div className='h-[81px] flex justify-center items-center bg-gray-100'>
@@ -71,15 +80,15 @@ const DetailProduct = () => {
       </div>
       <div className='w-main m-auto mt-4 flex'>
         <div className=' flex flex-col gap-4 w-2/5'>
-          <div className='w-[458px] h-[458px] border'>
+          <div className='w-[458px] h-[458px] border overflow-hidden'>
           <ReactImageMagnify {...{
               smallImage: {
                   alt: 'Wristwatch by Ted Baker London',
                   isFluidWidth: true,
-                  src: product?.thumb
+                  src: currentImage
               },
               largeImage: {
-                  src: product?.thumb,
+                  src: currentImage,
                   width: 1800,
                   height: 1500
               }
@@ -92,7 +101,7 @@ const DetailProduct = () => {
             >
               {product?.images?.map(el => (
               <div key={el} className=''>
-                  <img src={el} alt="product" className='h-[143px] w-[143px] border object-cover' />
+                  <img onClick={e => handleClickImage(e , el)} src={el} alt="product" className='h-[143px] w-[143px] border object-cover cursor-pointer' />
               </div>
               ))}
             </Slider>
@@ -101,13 +110,13 @@ const DetailProduct = () => {
         <div className='flex pr-[24px] w-2/5 flex-col gap-4'>
           <div className='flex items-center justify-between'>
           <h2 className='text-[30px] font-semibold'>{`${formatMoney(formatPrice(product?.price))} VNĐ`}</h2>
-          <span className='text-sm text-main'>{`Kho: ${product?.quantity}`}</span>
+          <span className='text-sm text-main'>{`In stock: ${product?.quantity}`}</span>
           </div>
           <div className='flex items-center gap-1'>
             {renderStarFromNumber(product?.totalRatings)?.map((el , index) => (
               <span key={index}>{el}</span>
             ))}
-            <span className='text-sm text-main italic'>{`(Đã bán: ${product?.sold} cái)`}</span>
+            <span className='text-sm text-main italic'>{`(Sold: ${product?.sold} pieces)`}</span>
           </div>
           <ul className='list-square pl-4 text-sm text-gray-500'>
             {product?.description?.map(el =>(
@@ -140,7 +149,11 @@ const DetailProduct = () => {
         </div>
         </div>
         <div className='w-main m-auto mt-8'>
-          <ProductInfomation />
+          <ProductInfomation
+          totalRatings={product?.totalRatings}
+          totalCount={18}
+          nameProduct={product?.title}
+          />
         </div>
         <div className='w-main m-auto mt-8'>
         <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>OTHER CUSTOMER ALSO LIKED</h3>
