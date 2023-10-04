@@ -76,7 +76,7 @@ const DealDaily = () => {
       <div className='w-full flex flex-col items-center pt-8 px-4 gap-2'>
       <img src={dealdaily?.thumb || ''} alt="" className='w-full object-contain' />
             <span className='line-clamp-1 text-center'>{dealdaily?.title}</span>
-            <span className='flex h-4'>{renderStarFromNumber(dealdaily?.totalRatings ,20).map((el , index) => (
+            <span className='flex h-4'>{renderStarFromNumber(dealdaily?.totalRatings ,20)?.map((el , index) => (
               <span key={index}>{el}</span>
             ))}</span>
             <span>{`${formatMoney(dealdaily?.price)} VND`}</span>
