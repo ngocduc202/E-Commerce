@@ -231,3 +231,14 @@ export const adminSidebar = [
   } ,
 
 ]
+
+export const roles = [
+  {
+    code : 2002 ,
+    value : "Admin"
+  },
+  {
+    code : 1504 ,
+    value : "User"
+  }
+]

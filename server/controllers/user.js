@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken")
 const sendEmail = require("../ultils/sendMail")
 const crypto = require("crypto")
 const makeToken = require('uniquid')
+const {user} = require('../ultils/constant')
 
 // const register  = asyncHandler(async (req , res) => {
 //   const {email , password , firstname , lastname} = req.body
@@ -187,10 +188,48 @@ const resetPassword = asyncHandler(async (req, res) => {
 })
 
 const getUsers = asyncHandler(async (req ,res) => {
-  const response  = await User.find().select('-refreshToken -password -role')
-  return res.status(200).json({
-    sucess : response ? true : false ,
-    users : response
+  const queries = {...req.query}
+  const excludeFields = ['limit' , 'sort' , 'page' , 'fields']
+  excludeFields.forEach(el => delete queries[el])
+  let queryString = JSON.stringify(queries)
+  queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g , mactchedEl => `$${mactchedEl}`)
+  const formatedQueries =JSON.parse(queryString)
+  //Filtering
+  if(queries?.name) formatedQueries.name = {$regex : queries.name , $options : 'i'}
+  const query = {}
+  if(req.query.q){
+    delete formatedQueries.q
+      formatedQueries['$or'] = [
+        {firstname : {$regex : queries.q , $options : 'i'}} ,
+        {lastname : {$regex : queries.q , $options : 'i'}} ,
+        {email : {$regex : queries.q , $options : 'i'}}
+      ]
+  }
+  let queryCommand = User.find(formatedQueries)
+  //Sorting
+  if(req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ')
+    queryCommand = queryCommand.sort(sortBy)
+  }
+  //Fields limiting
+  if(req.query.fields){
+    const fields = req.query.fields.split(',').join(' ')
+    queryCommand = queryCommand.select(fields)
+  }
+  //Pagination
+  const page = +req.query.page || 1
+  const limit = +req.query.limit || process.env.LIMIT_PRODUCTS
+  const skip = (page - 1) * limit
+  queryCommand.skip(skip).limit(limit)
+
+  queryCommand.exec(async (err , response) => {
+    if(err) throw new Error(err.message)
+    const counts = await User.find(formatedQueries).countDocuments()
+    return res.status(200).json({
+      success : response ? true : false ,
+      counts,
+      users : response ? response : "Cannot get products" ,
+    })
   })
 })
 
@@ -266,6 +305,14 @@ const updateCart = asyncHandler(async (req ,res) => {
   }
 })
 
+const createUsers = asyncHandler(async (req , res) => {
+    const response = await User.create(user)
+    return res.status(200).json({
+      success : response ? true : false ,
+      users : response ? response : 'Something went wrong'
+    })
+})
+
 module.exports = {
   register,
   login,
@@ -280,5 +327,6 @@ module.exports = {
   updateUserByAdmin ,
   updateUserAddress ,
   updateCart ,
-  finalRegister
+  finalRegister ,
+  createUsers
 }
