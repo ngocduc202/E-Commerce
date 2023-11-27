@@ -13,7 +13,7 @@ const createProduct = asyncHandler(async (req , res) => {
     const newProduct = await Product.create(req.body)
     return res.status(200).json({
       success : newProduct ? true : false ,
-      createProduct : newProduct ? newProduct : "Cannot create new product"
+      mes : newProduct ? 'Created' : "Failed"
     })
 })
 
@@ -49,8 +49,19 @@ const getProducts= asyncHandler(async (req , res) => {
     const colorQuery = colorArr.map(el =>({color : {$regex : el , $options : 'i'}}))
     colorQueryObject = {$or : colorQuery}
   }
-  const q = { ...colorQueryObject , ...formatedQueries}
-  let queryCommand = Product.find(q)
+  let queryObject = {}
+  if(queries?.q) {
+    delete formatedQueries.q
+    queryObject = {$or : [
+      {color : {$regex : queries.q , $options : 'i'}},
+      {title : {$regex :  queries.q , $options : 'i'}},
+      {category : {$regex :  queries.q , $options : 'i'}},
+      {brand : {$regex :  queries.q , $options : 'i'}},
+      {description : {$regex :  queries.q , $options : 'i'}},
+    ]}
+  }
+  const qr = { ...colorQueryObject , ...formatedQueries , ...queryObject}
+  let queryCommand = Product.find(qr)
   //Sorting
   if(req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ')
@@ -70,7 +81,7 @@ const getProducts= asyncHandler(async (req , res) => {
 
   queryCommand.exec(async (err , response) => {
     if(err) throw new Error(err.message)
-    const counts = await Product.find(q).countDocuments()
+    const counts = await Product.find(qr).countDocuments()
     return res.status(200).json({
       success : response ? true : false ,
       counts,

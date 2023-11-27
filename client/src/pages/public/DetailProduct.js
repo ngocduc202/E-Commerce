@@ -92,7 +92,7 @@ const DetailProduct = () => {
       </div>
       <div className='w-main m-auto mt-4 flex'>
         <div className=' flex flex-col gap-4 w-2/5'>
-          <div className='w-[458px] h-[458px] border overflow-hidden'>
+          <div className='w-[458px] h-[458px] border flex items-center overflow-hidden'>
           <ReactImageMagnify {...{
               smallImage: {
                   alt: 'Wristwatch by Ted Baker London',
@@ -134,7 +134,7 @@ const DetailProduct = () => {
             {product?.description?.length > 1 && product?.description?.map(el =>(
               <li key={el} className='leading-6'>{el}</li>
             )) }
-            { product?.description?.length === 1 && <div className='text-sm' dangerouslySetInnerHTML={{__html : DOMPurify.sanitize(product?.description[0])}}></div> }
+            { product?.description?.length === 1 && <div className='text-sm line-clamp-[10] mb-8' dangerouslySetInnerHTML={{__html : DOMPurify.sanitize(product?.description[0])}}></div> }
           </ul>
           <div className='flex flex-col gap-8'>
               <div className='flex items-center gap-4'>
