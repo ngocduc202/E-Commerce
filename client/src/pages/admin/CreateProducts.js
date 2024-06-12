@@ -195,18 +195,10 @@ const CreateProducts = () => {
             {preview.images.length > 0 &&   <div className='my-4  w-full gap-3 flex flex-wrap '>
               {preview.images?.map((el , index) =>(
                 <div
-                onMouseEnter={() => setHoverElm(el.name)}
                 key={index}
                 className='w-fit relative'
-                onMouseLeave={() => setHoverElm(null)}
                 >
                   <img  src={el.path} alt="product" className='w-[200px] object-contain' />
-                  {/* {hoverElm === el.name && <div
-                    className='absolute animate-scale-up-center cursor-pointer inset-0 bg-overlay flex items-center justify-center'
-                    onClick={() => handleRemoveImage(el.name)}
-                    >
-                    <RiDeleteBin2Fill size={24} color='white' />
-                    </div>} */}
                 </div>
               ))}
             </div>}

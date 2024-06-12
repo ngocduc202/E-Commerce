@@ -1,5 +1,5 @@
 import React ,{useState , useEffect, useCallback} from 'react'
-import { InputForm , Pagination } from 'components'
+import { CustomizeVarriants, InputForm , Pagination } from 'components'
 import { useForm } from 'react-hook-form'
 import { apiDeleteProduct, apiGetProducts } from 'apis/product'
 import moment from 'moment'
@@ -8,6 +8,9 @@ import useDebounce from 'hooks/useDebounce'
 import UpdateProduct from './UpdateProduct'
 import Swal from 'sweetalert2'
 import { toast } from 'react-toastify'
+import icons from '../../ultils/icons'
+
+const {BiCustomize , BiEdit ,RiDeleteBin6Line} = icons
 
 const ManageProduct = () => {
 
@@ -19,6 +22,7 @@ const ManageProduct = () => {
   const [counts, setCounts] = useState(0)
   const [editProduct, setEditProduct] = useState(null)
   const [update, setUpdate] = useState(false)
+  const [customizeVarriants, setCustomizeVarriants] = useState(null)
   const render = useCallback(() => {
     setUpdate(!update)
   })
@@ -80,6 +84,13 @@ const ManageProduct = () => {
             setEditProduct={setEditProduct}
             />
       </div>}
+      {customizeVarriants && <div className='absolute inset-0 bg-gray-100 min-h-screen z-50'>
+        <CustomizeVarriants
+            customizeVarriants={customizeVarriants}
+            render={render}
+            setCustomizeVarriants={setCustomizeVarriants}
+            />
+      </div>}
       <div className='h-[69px] w-full'></div>
         <div className='p-4 border-b w-full flex bg-gray-100 justify-between items-center fixed top-0'>
         <h1 className='text-3xl font-bold tracking-tighter border-b'>Manage products</h1>
@@ -108,6 +119,7 @@ const ManageProduct = () => {
                 <th className='text-center py-2'>Sold</th>
                 <th className='text-center py-2'>Color</th>
                 <th className='text-center py-2'>Ratings</th>
+                <th className='text-center py-2'>Varriants</th>
                 <th className='text-center py-2'>UpdatedAt</th>
                 <th className='text-center py-2'>Actions</th>
               </tr>
@@ -127,10 +139,12 @@ const ManageProduct = () => {
                   <td className='text-center py-2'>{el.sold}</td>
                   <td className='text-center py-2'>{el.color}</td>
                   <td className='text-center py-2'>{el.totalRatings}</td>
+                  <td className='text-center py-2'>{el.varriants?.length || 0}</td>
                   <td className='text-center py-2'>{moment(el.createdAt).format('DD/MM/YYYY')}</td>
                   <td className='text-center py-2'>
-                    <span onClick={() => setEditProduct(el)} className='text-blue-500 cursor-pointer px-1'>Edit</span>
-                    <span onClick={() => hanldeDeleteProduct(el._id)} className='text-blue-500 cursor-pointer px-1'>Remove</span>
+                    <span onClick={() => setEditProduct(el)} className='text-blue-500 inline-block hover:text-orange-500 cursor-pointer px-1'><BiEdit /></span>
+                    <span onClick={() => hanldeDeleteProduct(el._id)} className='text-blue-500 inline-block hover:text-orange-500 cursor-pointer px-1'><RiDeleteBin6Line /></span>
+                    <span onClick={() => setCustomizeVarriants(el)} className='text-blue-500 inline-block hover:text-orange-500 cursor-pointer px-1'><BiCustomize /></span>
                   </td>
                 </tr>
               ))}
