@@ -244,11 +244,16 @@ const deleteUser = asyncHandler(async (req ,res) => {
 
 const updateUser = asyncHandler(async (req ,res) => {
   const {_id} = req.user
+  const {firstname , lastname, email ,mobile} = req.body
+  const data ={firstname , lastname, email ,mobile}
+  if(req.file){
+    data.avatar = req.file.path
+  }
   if(!_id || Object.keys(req.body).length === 0) throw new Error("Missing inputs")
-  const response  = await User.findByIdAndUpdate(_id , req.body , {new : true}).select("-password -role -refreshToken")
+  const response  = await User.findByIdAndUpdate(_id , data , {new : true}).select("-password -role -refreshToken")
   return res.status(200).json({
-    sucess : response ? true : false ,
-    updatedUser : response ? response : "Some thing went wrong"
+    success : response ? true : false ,
+    mes : response ? "Updated" : "Some thing went wrong"
   })
 })
 

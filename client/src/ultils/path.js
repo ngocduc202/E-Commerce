@@ -19,7 +19,10 @@ const path = {
   CREATE_PRODUCTS : 'create-products',
   //Member
   MEMBER : 'member' ,
-  PERSONAL : 'personal'
+  PERSONAL : 'personal',
+  MY_CART : 'my-cart',
+  HISTORY : 'by-history' ,
+  WHISHLIST : 'wishlist'
 }
 
 export default path

@@ -3,7 +3,7 @@ import {Route , Routes} from 'react-router-dom'
 import {Login , Home , Public , Blogs ,DetailProduct ,FAQ , Services ,Products ,FinalRegister , ResetPassword} from './pages/public'
 import path from './ultils/path';
 import { AdminLayout , ManageOrder , ManageProduct , ManageUser , CreateProducts, DashBoard } from 'pages/admin'
-import { MemberLayout , Personal } from 'pages/member'
+import { MemberLayout , Personal , MyCart , Whishlist , History } from 'pages/member'
 import {getCategories} from './store/app/asyncAction'
 import {useDispatch , useSelector} from 'react-redux'
 import { ToastContainer } from 'react-toastify';
@@ -40,6 +40,9 @@ function App() {
           </Route>
           <Route path={path.MEMBER} element={<MemberLayout />}>
               <Route path={path.PERSONAL} element={<Personal />} />
+              <Route path={path.MY_CART} element={<MyCart />} />
+              <Route path={path.WHISHLIST} element={<Whishlist />} />
+              <Route path={path.HISTORY} element={<History />} />
           </Route>
           <Route path={path.FINAL_REGISTER} element={<FinalRegister />} />
           <Route path={path.LOGIN} element={<Login />} />
