@@ -17,14 +17,17 @@ const settings= {
   slidesToScroll : 1
 }
 
-const DetailProduct = () => {
-  const {pid , category} = useParams()
+const DetailProduct = ({isQuickView ,data}) => {
+  const params = useParams()
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [currentImage, setCurrentImage] = useState(null)
   const [relatedProduct, setRelatedProduct] = useState(null)
   const [update, setUpdate] = useState(false)
   const [varriant, setVarriant] = useState(null)
+  const [pid, setPid] = useState(null)
+  const [category, setCategory] = useState(null)
+
   const [currentProduct, setCurrentProduct] = useState({
     title : "",
     thumb : "",
@@ -45,6 +48,16 @@ const DetailProduct = () => {
       setRelatedProduct(response.products)
     }
   }
+  useEffect(() => {
+    if(data){
+      setPid(data.pid)
+      setCategory(data.category)
+    }else if (params){
+      setPid(params.pid)
+      setCategory(params.category)
+    }
+  }, [data , params])
+
 
   useEffect(() => {
     if(varriant){
@@ -102,8 +115,8 @@ const DetailProduct = () => {
   }
 
   return (
-    <div className='w-full'>
-      <div className='h-[81px] flex justify-center items-center bg-gray-100'>
+    <div className={clsx('w-full')}>
+      {!isQuickView && <div className='h-[81px] flex justify-center items-center bg-gray-100'>
         <div className='w-main'>
         <h3 className='font-semibold'>{currentProduct?.title || product?.title}</h3>
         <Breadcrumb
@@ -111,9 +124,9 @@ const DetailProduct = () => {
         category={category}
         />
         </div>
-      </div>
-      <div className='w-main m-auto mt-4 flex'>
-        <div className=' flex flex-col gap-4 w-2/5'>
+      </div>}
+      <div onClick={e => e.stopPropagation()} className={clsx(' bg-white m-auto mt-4 flex' , isQuickView ? 'max-w-[900px] gap-16 p-8 rounded-sm max-h-[80vh] overflow-y-auto' : 'w-main')}>
+        <div className={clsx(' flex flex-col gap-4 w-2/5' ,isQuickView && "w-1/2")}>
           <div className='w-[458px] h-[458px] border flex items-center overflow-hidden'>
           <ReactImageMagnify {...{
               smallImage: {
@@ -146,7 +159,7 @@ const DetailProduct = () => {
             </Slider>
           </div>
         </div>
-        <div className='flex pr-[24px] w-2/5 flex-col gap-4'>
+        <div className={clsx('flex pr-[24px] w-2/5 flex-col gap-4' , isQuickView && "w-1/2")}>
           <div className='flex items-center justify-between'>
           <h2 className='text-[30px] font-semibold'>{`${formatMoney(formatPrice( currentProduct?.price ||product?.price))} VNĐ`}</h2>
           <span className='text-sm text-main'>{`In stock: ${product?.quantity}`}</span>
@@ -203,27 +216,32 @@ const DetailProduct = () => {
               </Button>
           </div>
         </div>
-        <div className='w-1/5'>
-          {productExtraInfomation.map(el => (
-            <ProductExtraInfoItem
-              key={el.id}
-              title={el.title}
-              icons={el.icons}
-              sub={el.sub}
-            />
-          ))}
+              {!isQuickView &&
+                      <div className='w-1/5'>
+                      {productExtraInfomation.map(el => (
+                        <ProductExtraInfoItem
+                          key={el.id}
+                          title={el.title}
+                          icons={el.icons}
+                          sub={el.sub}
+                        />
+                      ))}
+                    </div>
+              }
         </div>
-        </div>
-        <div className='w-main m-auto mt-8'>
-          <ProductInfomation
-          totalRatings={product?.totalRatings}
-          ratings={product?.ratings}
-          nameProduct={product?.title}
-          pid={product?._id}
-          rerender={rerender}
-          />
-        </div>
-        <div className='w-main m-auto mt-8'>
+          {!isQuickView &&
+           <div className='w-main m-auto mt-8'>
+           <ProductInfomation
+           totalRatings={product?.totalRatings}
+           ratings={product?.ratings}
+           nameProduct={product?.title}
+           pid={product?._id}
+           rerender={rerender}
+           />
+         </div>
+          }
+        {!isQuickView && <>
+          <div className='w-main m-auto mt-8'>
         <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>OTHER CUSTOMER ALSO LIKED</h3>
         <CustomSlider
         product={relatedProduct}
@@ -231,8 +249,8 @@ const DetailProduct = () => {
         />
         </div>
         <div className='h-[100px] w-full'>
-
         </div>
+        </>}
     </div>
   )
 }

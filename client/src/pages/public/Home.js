@@ -9,7 +9,6 @@ const Home = () => {
 
     const {newProducts} = useSelector(state => state.products)
     const {categories} = useSelector(state => state.app)
-    const {isLoggedIn , current} = useSelector(state => state.user)
 
 return (
     <>
@@ -23,10 +22,10 @@ return (
             <BestSeller/>
         </div>
     </div>
-    <div className='my-8'>
+    <div className='my-8 w-main m-auto'>
         <FeatureProduct />
     </div>
-    <div className='my-8 w-full'>
+    <div className='my-8 w-main m-auto'>
     <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>NEW ARRIVAL</h3>
     <div className='mt-4 mx-[-10px] '>
         <CustomSlider
@@ -34,7 +33,7 @@ return (
         />
     </div>
     </div>
-    <div className='my-8 w-full'>
+    <div className='my-8 w-main m-auto'>
     <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>HOT COLLECTIONS</h3>
     <div className='flex flex-wrap gap-4 mt-4 '>
         {categories?.filter(el => el.brand.length > 0)?.map(el => (
@@ -57,7 +56,7 @@ return (
         ))}
     </div>
     </div>
-    <div className='my-8 w-full'>
+    <div className='my-8 w-main m-auto'>
         <h3 className='text-[20px] font-semibold py-[15px] border-b-2 border-main'>BLOG POST</h3>
     </div>
     </>
