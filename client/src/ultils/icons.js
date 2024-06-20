@@ -1,6 +1,6 @@
 import {RiPhoneFill , RiTruckFill , RiBillLine , RiDeleteBin6Line} from "react-icons/ri"
 import {MdEmail ,MdGroups} from "react-icons/md"
-import {BsHandbagFill , BsFillSuitHeartFill , BsShieldShaded , BsReplyFill} from "react-icons/bs"
+import {BsHandbagFill , BsFillSuitHeartFill , BsShieldShaded , BsReplyFill , BsCartPlus , BsFillCartCheckFill , BsFillCartPlusFill} from "react-icons/bs"
 import {FaUserCircle , FaTty} from "react-icons/fa"
 import {IoIosArrowForward} from "react-icons/io"
 import {AiFillHome ,AiFillStar , AiOutlineStar , AiFillEye , AiOutlineMenu , AiOutlineLogout , AiFillGift , AiOutlineDown ,AiOutlineDashboard} from "react-icons/ai"
@@ -32,7 +32,10 @@ const icons ={
   RiBillLine ,
   BiCustomize ,
   BiEdit ,
-  RiDeleteBin6Line
+  RiDeleteBin6Line ,
+  BsCartPlus ,
+  BsFillCartCheckFill ,
+  BsFillCartPlusFill
 }
 
 export default icons

@@ -1,6 +1,6 @@
 import React ,{useCallback, useEffect , useState} from 'react'
-import { useParams } from 'react-router-dom'
-import { apiGetProduct  , apiGetProducts} from '../../apis'
+import { createSearchParams, useParams } from 'react-router-dom'
+import { apiGetProduct  , apiGetProducts, apiUpdateCart} from '../../apis'
 import  {Breadcrumb , Button , SelectQuantity , ProductExtraInfoItem ,ProductInfomation ,CustomSlider} from '../../components'
 import Slider from 'react-slick'
 import ReactImageMagnify from 'react-image-magnify';
@@ -8,6 +8,12 @@ import { formatMoney , formatPrice , renderStarFromNumber} from "../../ultils/he
 import {productExtraInfomation} from '../../ultils/contanst'
 import DOMPurify from 'dompurify';
 import clsx from 'clsx'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import Swal from 'sweetalert2'
+import { getCurrent } from 'store/user/asyncAction'
+import path from 'ultils/path'
+import withBaseComponent from 'hocs/withBaseComponent'
 
 const settings= {
   dots : false,
@@ -17,8 +23,9 @@ const settings= {
   slidesToScroll : 1
 }
 
-const DetailProduct = ({isQuickView ,data}) => {
+const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => {
   const params = useParams()
+  const {current} = useSelector(state => state.user)
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [currentImage, setCurrentImage] = useState(null)
@@ -68,6 +75,14 @@ const DetailProduct = ({isQuickView ,data}) => {
         images : product?.varriants?.find(el => el.sku === varriant)?.images,
         thumb : product?.varriants?.find(el => el.sku === varriant)?.thumb
       })
+    }else{
+      setCurrentProduct({
+        title : product?.title ,
+        color : product?.color,
+        price : product?.price,
+        images : product?.images || [],
+        thumb : product?.thumb
+      })
     }
   } , [varriant])
 
@@ -112,6 +127,38 @@ const DetailProduct = ({isQuickView ,data}) => {
   const handleClickImage = (e ,el) => {
     e.stopPropagation()
     setCurrentImage(el)
+  }
+
+  const handleAddToCart = async () => {
+    if(!current) return Swal.fire({
+      title : "Almost....",
+      text : "Please login to continue",
+      icon : "info",
+      cancelButtonText : "Not now!",
+      showCancelButton : true ,
+      confirmButtonText : "Go login"
+    }).then(async (rs) => {
+      if(rs.isConfirmed) {
+        navigate({
+          pathname : `/${path.LOGIN}`,
+          search : createSearchParams({redirect : location.pathname}).toString()
+        })
+      }
+    })
+    const response = await apiUpdateCart({
+      pid : pid ,
+      color : currentProduct?.color || product?.color ,
+      quantity ,
+      price : currentProduct?.price || product?.price,
+      thumbnail : currentProduct?.thumb || product?.thumb ,
+      title : currentProduct?.title || product?.title
+    })
+    if(response.success) {
+      toast.success(response.mes)
+      dispatch(getCurrent())
+    }else{
+      toast.error(response.mes)
+    }
   }
 
   return (
@@ -211,7 +258,7 @@ const DetailProduct = ({isQuickView ,data}) => {
               handleChangeQuantity= {handleChangeQuantity}
               />
               </div>
-              <Button fw>
+              <Button handleOnClick={handleAddToCart} fw>
                   Add to Cart
               </Button>
           </div>
@@ -255,4 +302,4 @@ const DetailProduct = ({isQuickView ,data}) => {
   )
 }
 
-export default DetailProduct
+export default withBaseComponent(DetailProduct)

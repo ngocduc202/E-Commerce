@@ -6,6 +6,7 @@ import { useDispatch , useSelector } from 'react-redux'
 import icons from '../../ultils/icons'
 import { logout , clearMessage } from '../../store/user/userSlice'
 import Swal from 'sweetalert2'
+import withBaseComponent from 'hocs/withBaseComponent'
 
 const {AiOutlineLogout} = icons
 
@@ -54,4 +55,4 @@ const TopHeader = () => {
   )
 }
 
-export default memo(TopHeader)
+export default withBaseComponent(TopHeader)

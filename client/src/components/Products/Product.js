@@ -8,17 +8,41 @@ import icons from '../../ultils/icons'
 import withBaseComponent from 'hocs/withBaseComponent'
 import { showModal } from 'store/app/appSlice'
 import { DetailProduct } from 'pages/public'
+import { apiUpdateCart } from 'apis'
+import { toast } from 'react-toastify'
+import { getCurrent } from 'store/user/asyncAction'
+import { useSelector } from 'react-redux'
+import Swal from 'sweetalert2'
+import path from 'ultils/path'
 
 
-const {AiFillEye , AiOutlineMenu , BsFillSuitHeartFill} = icons
+const {AiFillEye , BsFillCartCheckFill , BsFillSuitHeartFill , BsFillCartPlusFill} = icons
 
 const Product = ({productData , isNew , normal , navigate , dispatch}) => {
   const [isShowOption, setIsShowOption] = useState(false)
-
-  const handleClickOptions = (e , flag) => {
+  const {current} = useSelector(state => state.user)
+  const handleClickOptions = async (e , flag) => {
     e.stopPropagation()
-    if(flag === "MENU") {
-      navigate(`/${productData?.category?.toLowerCase()}/${productData?._id}/${productData?.title}`)
+    if(flag === "CART") {
+      if(!current) return Swal.fire({
+        title : "Almost....",
+        text : "Please login to continue",
+        icon : "info",
+        cancelButtonText : "Not now!",
+        showCancelButton : true ,
+        confirmButtonText : "Go login"
+      }).then((rs) => {
+        if(rs.isConfirmed) {
+          navigate(`/${path.LOGIN}`)
+        }
+      })
+      const response = await apiUpdateCart({pid : productData?._id , color : productData?.color})
+      if(response.success) {
+        toast.success(response.mes)
+        dispatch(getCurrent())
+      }else{
+        toast.error(response.mes)
+      }
     }
     if(flag === "WISHLIST") {
       console.log("WISHLIST")
@@ -45,9 +69,12 @@ const Product = ({productData , isNew , normal , navigate , dispatch}) => {
           <div className='w-full relative'>
             {isShowOption &&
             <div className='absolute bottom-[-10px] left-0 right-0 flex justify-center gap-2 animate-slide-top'>
-            <span onClick={(e) => handleClickOptions(e,"QUICKVIEW")}><SelectOption icons ={<AiFillEye />} /></span>
-            <span onClick={(e) => handleClickOptions(e,"MENU")}><SelectOption icons ={<AiOutlineMenu />} /></span>
-            <span onClick={(e) => handleClickOptions(e,"WISHLIST")}><SelectOption icons ={<BsFillSuitHeartFill />} /></span>
+            <span title='Quickview' onClick={(e) => handleClickOptions(e,"QUICKVIEW")}><SelectOption icons ={<AiFillEye />} /></span>
+              {current?.cart?.some(el => el.product === productData?._id.toString()) ?
+                <span title='Added to cart' ><SelectOption icons ={<BsFillCartCheckFill color='green' />} /></span>
+                : <span title='Add to cart'onClick={(e) => handleClickOptions(e,"CART")} ><SelectOption icons ={<BsFillCartPlusFill  />} /></span>
+            }
+            <span title='Add to wishlist' onClick={(e) => handleClickOptions(e,"WISHLIST")}><SelectOption icons ={<BsFillSuitHeartFill />} /></span>
             </div>
             }
             <img src={productData?.thumb || ''} alt="" className='w-[274px] h-[274px] object-cover' />
