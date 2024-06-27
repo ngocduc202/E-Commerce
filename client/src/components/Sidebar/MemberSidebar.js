@@ -3,7 +3,7 @@ import avatar from 'assets/avatarDefault.png'
 import { memberSidebar } from 'ultils/contanst'
 import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
-import { AiOutlineCaretDown , AiOutlineCaretRight } from 'react-icons/ai'
+import { AiFillHome, AiOutlineCaretDown , AiOutlineCaretRight } from 'react-icons/ai'
 import { useSelector } from 'react-redux'
 
 const activedStyle = 'px-4 py-2 flex items-center gap-2  bg-blue-500 '
@@ -58,6 +58,12 @@ const MemberSidebar = () => {
                 </div>}
           </Fragment>
       ))}
+                    <NavLink
+                  to={'/'}
+                  className={clsx(notActivedStyle)}
+                  >
+                  <AiFillHome />  Go Home
+                  </NavLink>
     </div>
 </div>
   )

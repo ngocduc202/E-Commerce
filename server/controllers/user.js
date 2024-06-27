@@ -288,8 +288,8 @@ const updateCart = asyncHandler(async (req ,res) => {
   const {pid , quantity = 1 ,color , price , thumbnail , title} = req.body
   if(!pid || !color) throw new Error("Missing inputs")
   const user = await User.findById(_id).select('cart')
-  const alreadyProduct = user?.cart?.find(el => el.product.toString() === pid)
-  if(alreadyProduct && alreadyProduct.color === color)
+  const alreadyProduct = user?.cart?.find(el => el.product.toString() === pid && el.color === color)
+  if(alreadyProduct)
   {
         const response = await User.updateOne({cart : {$elemMatch : alreadyProduct}} , {
           $set : {"cart.$.quantity" : quantity , "cart.$.price" : price, "cart.$.thumbnail" : thumbnail ,"cart.$.title" : title}}

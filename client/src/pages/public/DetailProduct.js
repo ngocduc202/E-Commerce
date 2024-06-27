@@ -1,4 +1,4 @@
-import React ,{useCallback, useEffect , useState} from 'react'
+import React ,{useCallback, useEffect , useRef, useState} from 'react'
 import { createSearchParams, useParams } from 'react-router-dom'
 import { apiGetProduct  , apiGetProducts, apiUpdateCart} from '../../apis'
 import  {Breadcrumb , Button , SelectQuantity , ProductExtraInfoItem ,ProductInfomation ,CustomSlider} from '../../components'
@@ -24,6 +24,7 @@ const settings= {
 }
 
 const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => {
+  const titleRef = useRef()
   const params = useParams()
   const {current} = useSelector(state => state.user)
   const [product, setProduct] = useState(null)
@@ -84,7 +85,7 @@ const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => 
         thumb : product?.thumb
       })
     }
-  } , [varriant])
+  } , [varriant , product])
 
   useEffect(() => {
     if(pid){
@@ -92,6 +93,7 @@ const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => 
       fetchProducts()
     }
     window.scrollTo(0 ,0)
+    titleRef.current.scrollIntoView({block : 'center' , behavior : 'smooth'})
   }, [pid])
 
   const rerender = useCallback(() => {
@@ -164,7 +166,7 @@ const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => 
   return (
     <div className={clsx('w-full')}>
       {!isQuickView && <div className='h-[81px] flex justify-center items-center bg-gray-100'>
-        <div className='w-main'>
+        <div ref={titleRef} className='w-main'>
         <h3 className='font-semibold'>{currentProduct?.title || product?.title}</h3>
         <Breadcrumb
         title={currentProduct?.title || product?.title}
@@ -193,12 +195,12 @@ const DetailProduct = ({isQuickView ,data , location , dispatch , navigate}) => 
             className='image-slider flex gap-2'
             {...settings}
             >
-              {currentProduct?.images.length === 0  && product?.images?.map(el => (
+              {currentProduct?.images?.length === 0  && product?.images?.map(el => (
               <div key={el} className=''>
                   <img onClick={e => handleClickImage(e , el)} src={el} alt="product" className='h-[143px] w-[143px] border object-cover cursor-pointer' />
               </div>
               ))}
-                  {currentProduct?.images.length > 0  && currentProduct?.images?.map(el => (
+                  {currentProduct?.images?.length > 0  && currentProduct?.images?.map(el => (
               <div key={el} className=''>
                   <img onClick={e => handleClickImage(e , el)} src={el} alt="product" className='h-[143px] w-[143px] border object-cover cursor-pointer' />
               </div>

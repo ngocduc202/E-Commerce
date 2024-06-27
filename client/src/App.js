@@ -3,7 +3,7 @@ import {Route , Routes} from 'react-router-dom'
 import {Login , Home , Public , Blogs ,DetailProduct ,FAQ , Services ,Products ,FinalRegister , ResetPassword, DetailCart} from './pages/public'
 import path from './ultils/path';
 import { AdminLayout , ManageOrder , ManageProduct , ManageUser , CreateProducts, DashBoard } from 'pages/admin'
-import { MemberLayout , Personal , MyCart , Whishlist , History } from 'pages/member'
+import { MemberLayout , Personal , MyCart , Whishlist , History, Checkout } from 'pages/member'
 import {getCategories} from './store/app/asyncAction'
 import {useDispatch , useSelector} from 'react-redux'
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +26,7 @@ function App() {
       </div>}
       {isShowModal && <Modal>{modalChildren}</Modal>}
       <Routes>
+              <Route path={path.CHECKOUT} element={<Checkout />} />
           <Route path={path.PUBLIC} element={<Public/>}>
               <Route path={path.HOME} element={<Home />} />
               <Route path={path.BLOGS} element={<Blogs />} />
@@ -34,7 +35,6 @@ function App() {
               <Route path={path.OUR_SERVICES} element={<Services />} />
               <Route path={path.PRODUCTS} element={<Products />} />
               <Route path={path.RESET_PASSWORD} element={<ResetPassword />} />
-              <Route path={path.DETAIL_CART} element={<DetailCart />} />
               <Route path={path.ALL} element={<Home />} />
           </Route>
           <Route path={path.ADMIN} element={<AdminLayout />}>
@@ -46,7 +46,7 @@ function App() {
           </Route>
           <Route path={path.MEMBER} element={<MemberLayout />}>
               <Route path={path.PERSONAL} element={<Personal />} />
-              <Route path={path.MY_CART} element={<MyCart />} />
+              <Route path={path.MY_CART} element={<DetailCart />} />
               <Route path={path.WHISHLIST} element={<Whishlist />} />
               <Route path={path.HISTORY} element={<History />} />
           </Route>
